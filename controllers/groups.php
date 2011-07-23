@@ -44,7 +44,7 @@ class Groups extends Admin_Controller {
 			if ($this->save_navigation())
 			{
 				Template::set_message(lang("navigation_create_success"), 'success');
-				Template::redirect('/admin/content/navigation/groups');
+				Template::redirect(SITE_AREA.'/content/navigation/groups');
 			}
 			else 
 			{
@@ -69,7 +69,7 @@ class Groups extends Admin_Controller {
 		if (empty($id))
 		{
 			Template::set_message(lang("navigation_invalid_id"), 'error');
-			redirect('/admin/content/navigation/groups');
+			redirect(SITE_AREA.'/content/navigation/groups');
 		}
 	
 		if ($this->input->post('submit'))
@@ -110,7 +110,7 @@ class Groups extends Admin_Controller {
 			}
 		}
 		
-		redirect('/admin/content/navigation/groups');
+		redirect(SITE_AREA.'/content/navigation/groups');
 	}
 		
 	public function save_navigation($type='insert', $id=0) 

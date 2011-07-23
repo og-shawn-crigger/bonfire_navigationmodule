@@ -22,7 +22,7 @@
 	<?php else: ?>
 	
 	<div class="notification attention">
-		<p><?php echo lang('navigation_no_records'); ?> <?php echo anchor('admin/content/navigation/create', lang('navigation_create_new'), array("class" => "ajaxify")) ?></p>
+		<p><?php echo lang('navigation_no_records'); ?> <?php echo anchor(SITE_AREA.'/content/navigation/create', lang('navigation_create_new'), array("class" => "ajaxify")) ?></p>
 	</div>
 	
 	<?php endif; ?>
@@ -32,7 +32,7 @@
 		<div class="scrollable" id="ajax-content">
 				
 			<div class="box create rounded">
-				<a class="button good ajaxify" href="<?php echo site_url('/admin/content/navigation/create')?>"><?php echo lang('navigation_create_new_button');?></a>
+				<a class="button good ajaxify" href="<?php echo site_url(SITE_AREA.'/content/navigation/create')?>"><?php echo lang('navigation_create_new_button');?></a>
 
 				<h3><?php echo lang('navigation_create_new');?></h3>
 
@@ -61,7 +61,7 @@
 					<tbody class="sortable">
 			<?php endif;?>
 					<tr>
-					<td><?php echo form_hidden('action_to[]', $record->nav_id); ?><?php echo anchor('admin/content/navigation/edit/'. $record->nav_id, $record->title, 'class="ajaxify"') ?></td>
+					<td><?php echo form_hidden('action_to[]', $record->nav_id); ?><?php echo anchor(SITE_AREA.'/content/navigation/edit/'. $record->nav_id, $record->title, 'class="ajaxify"') ?></td>
 					<td><?php echo $record->url;?></td>
 					<td><?php echo $record->parent_id;?></td>
 					</tr>

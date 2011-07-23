@@ -25,12 +25,12 @@ $id = isset($navigation['nav_group_id']) ? "/".$navigation['nav_group_id'] : '';
 
 	<div class="text-right">
 		<br/>
-		<input type="submit" name="submit" value="Edit Navigation" /> or <?php echo anchor('admin/content/navigation', lang('navigation_cancel')); ?>
+		<input type="submit" name="submit" value="Edit Navigation" /> or <?php echo anchor(SITE_AREA.'/content/navigation', lang('navigation_cancel')); ?>
 	</div>
 	<?php echo form_close(); ?>
 
 	<div class="box delete rounded">
-		<a class="button" id="delete-me" href="<?php echo site_url('admin/content/navigation/delete/'. $id); ?>" onclick="return confirm('<?php echo lang('navigation_delete_confirm'); ?>')"><?php echo lang('navigation_delete_record'); ?></a>
+		<a class="button" id="delete-me" href="<?php echo site_url(SITE_AREA.'/content/navigation/delete/'. $id); ?>" onclick="return confirm('<?php echo lang('navigation_delete_confirm'); ?>')"><?php echo lang('navigation_delete_record'); ?></a>
 		
 		<h3><?php echo lang('navigation_delete_record'); ?></h3>
 		

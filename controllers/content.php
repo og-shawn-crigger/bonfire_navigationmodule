@@ -70,7 +70,7 @@ class Content extends Admin_Controller {
 			if ($this->save_navigation())
 			{
 				Template::set_message(lang("navigation_create_success"), 'success');
-				Template::redirect('/admin/content/navigation');
+				Template::redirect(SITE_AREA.'/content/navigation');
 			}
 			else 
 			{
@@ -94,7 +94,7 @@ class Content extends Admin_Controller {
 		if (empty($id))
 		{
 			Template::set_message(lang("navigation_invalid_id"), 'error');
-			redirect('/admin/content/navigation');
+			redirect(SITE_AREA.'/content/navigation');
 		}
 
 		$nav_items = $this->navigation_model->order_by('nav_group_id, position')->find_all();
@@ -149,7 +149,7 @@ class Content extends Admin_Controller {
 			}
 		}
 		
-		redirect('/admin/content/navigation');
+		redirect(SITE_AREA.'/content/navigation');
 	}
 		
 	public function save_navigation($type='insert', $id=0) 

@@ -25,6 +25,6 @@ $id = isset($navigation['nav_group_id']) ? "/".$navigation['nav_group_id'] : '';
 
 	<div class="text-right">
 		<br/>
-		<input type="submit" name="submit" value="Create Navigation" /> or <?php echo anchor('admin/content/navigation', lang('navigation_cancel')); ?>
+		<input type="submit" name="submit" value="Create Navigation" /> or <?php echo anchor(SITE_AREA.'/content/navigation', lang('navigation_cancel')); ?>
 	</div>
 	<?php echo form_close(); ?>

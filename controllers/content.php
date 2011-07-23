@@ -44,16 +44,24 @@ class Content extends Admin_Controller {
 		$this->auth->restrict('Navigation.Content.Create');
 
 		$nav_items = $this->navigation_model->order_by('nav_group_id, position')->find_all();
+		$data['parents'] = array();
 		$data['parents'][] = '';
-		foreach($nav_items as $key => $record)
+		if (is_array($nav_items) && count($nav_items)) 
 		{
-			$data['parents'][$record->nav_id] = $record->title;
+			foreach($nav_items as $key => $record)
+			{
+				$data['parents'][$record->nav_id] = $record->title;
+			}
 		}
 
 		$groups = $this->navigation_group_model->find_all('nav_group_id');
-		foreach($groups as $group_id => $record)
+		$data['groups'] = array();
+		if (is_array($groups) && count($groups))
 		{
-			$data['groups'][$group_id] = $record->title;
+			foreach($groups as $group_id => $record)
+			{
+				$data['groups'][$group_id] = $record->title;
+			}
 		}
 		Template::set("data", $data);
 

@@ -152,6 +152,9 @@ class Content extends Admin_Controller {
 	
 		if (!empty($id))
 		{	
+			$this->navigation_model->update_parent($id, 0);
+			$this->navigation_model->un_parent_kids($id);
+			
 			if ($this->navigation_model->delete($id))
 			{
 				Template::set_message(lang("navigation_delete_success"), 'success');

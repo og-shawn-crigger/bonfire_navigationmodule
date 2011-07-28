@@ -101,8 +101,13 @@ class Navigation_model extends BF_Model {
 			// if they're trying to clear the parent selection we need to get the parent's id
 			$current = $this->db->get_where('navigation', array('nav_id' => $id))->row();
 
-			//mark that it has no children
-			$this->db->update('navigation', array('has_kids' => 0), array('nav_id' => $current->parent_id));
+			// check if the parent has more than one kid
+			$siblings = $this->get_children($current->parent_id);
+			if (count($siblings) == 1)
+			{
+				//mark that it has no children
+				$this->db->update('navigation', array('has_kids' => 0), array('nav_id' => $current->parent_id));
+			}
 		}
 		else
 		{
@@ -112,4 +117,24 @@ class Navigation_model extends BF_Model {
 		return $this->db->update('navigation', array('parent_id' => $parent_id), array('nav_id' => $id));
 	}
 
+	/**
+	 * Remove the parent id from kids
+	 * 
+	 * @access public
+	 * @param int $id        The ID of the link item
+	 * @param int $parent_id ID of the parent
+	 * @return void
+	 */
+	public function un_parent_kids($id) 
+	{
+		if($id != 0)
+		{
+			// check if the parent has more than one kid
+			$children = $this->get_children($id);
+			foreach ($children as $child)
+			{
+				$this->db->update('navigation', array('parent_id' => 0), array('nav_id' => $child->nav_id));
+			}
+		}
+	}
 }

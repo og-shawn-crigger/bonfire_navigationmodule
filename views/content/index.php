@@ -63,7 +63,7 @@
 					<tr>
 					<td><?php echo form_hidden('action_to[]', $record->nav_id); ?><?php echo anchor(SITE_AREA.'/content/navigation/edit/'. $record->nav_id, $record->title, 'class="ajaxify"') ?></td>
 					<td><?php echo $record->url;?></td>
-					<td><?php echo $record->parent_id;?></td>
+					<td><?php echo $record->parent_id != 0 ? $records[$record->parent_id]->title : '';?></td>
 					</tr>
 			<?php  $group = $record->nav_group_id; ?>
 		<?php endforeach; ?>

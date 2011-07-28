@@ -86,4 +86,30 @@ class Navigation_model extends BF_Model {
 		return $children;
 	}
 
+	/**
+	 * Update the current link's parent
+	 * 
+	 * @access public
+	 * @param int $id        The ID of the link item
+	 * @param int $parent_id ID of the parent
+	 * @return void
+	 */
+	public function update_parent($id = 0, $parent_id = 0) 
+	{
+		if($parent_id == 0)
+		{
+			// if they're trying to clear the parent selection we need to get the parent's id
+			$current = $this->db->get_where('navigation', array('nav_id' => $id))->row();
+
+			//mark that it has no children
+			$this->db->update('navigation', array('has_kids' => 0), array('nav_id' => $current->parent_id));
+		}
+		else
+		{
+			$this->db->update('navigation', array('has_kids' => 1), array('nav_id' => $parent_id));
+		}
+		
+		return $this->db->update('navigation', array('parent_id' => $parent_id), array('nav_id' => $id));
+	}
+
 }

@@ -27,7 +27,14 @@ class Content extends Admin_Controller {
 	public function index()
 	{
 		$data = array();
-		$data["records"] = $this->navigation_model->order_by('nav_group_id, position')->find_all();
+		$nav_items = $this->navigation_model->order_by('nav_group_id, parent_id, position')->find_all();
+		if (is_array($nav_items) && count($nav_items)) 
+		{
+			foreach($nav_items as $key => $record)
+			{
+				$data["records"][$record->nav_id] = $record;
+			}
+		}
 		$data["groups"] = $this->navigation_group_model->find_all('nav_group_id');
 
 		Template::set_view("content/index");
@@ -78,7 +85,7 @@ class Content extends Admin_Controller {
 			}
 		}
 	
-		Template::set_view('content/create');
+		Template::set_view('content/form');
 		Template::set('toolbar_title', lang("navigation_create_new_button"));
 		Template::render();
 	}
@@ -97,20 +104,6 @@ class Content extends Admin_Controller {
 			redirect(SITE_AREA.'/content/navigation');
 		}
 
-		$nav_items = $this->navigation_model->order_by('nav_group_id, position')->find_all();
-		$data['parents'][] = '';
-		foreach($nav_items as $key => $record)
-		{
-			$data['parents'][$record->nav_id] = $record->title;
-		}
-
-		$groups = $this->navigation_group_model->find_all('nav_group_id');
-		foreach($groups as $group_id => $record)
-		{
-			$data['groups'][$group_id] = $record->title;
-		}
-		Template::set("data", $data);
-
 		if ($this->input->post('submit'))
 		{
 			if ($this->save_navigation('update', $id))
@@ -122,11 +115,30 @@ class Content extends Admin_Controller {
 				Template::set_message(lang("navigation_edit_failure") . $this->navigation_model->error, 'error');
 			}
 		}
-		
-		Template::set('navigation', $this->navigation_model->find($id));
+
+		$nav_record = $this->navigation_model->find($id);
+		$nav_items = $this->navigation_model->order_by('nav_group_id, position')->find_all_by('nav_group_id', $nav_record->nav_group_id);
+		$data['parents'][] = '';
+		foreach($nav_items as $key => $record)
+		{
+			// remove the current link
+			if($id != $record->nav_id)
+			{
+				$data['parents'][$record->nav_id] = $record->title;
+			}
+		}
+
+		$groups = $this->navigation_group_model->find_all('nav_group_id');
+		foreach($groups as $group_id => $record)
+		{
+			$data['groups'][$group_id] = $record->title;
+		}
+		Template::set("data", $data);
+
+		Template::set('navigation', $nav_record);
 	
 		Template::set('toolbar_title', lang("navigation_edit_heading"));
-		Template::set_view('content/edit');
+		Template::set_view('content/form');
 		Template::set("toolbar_title", "Manage Navigation");
 		Template::render();		
 	}
@@ -154,13 +166,16 @@ class Content extends Admin_Controller {
 		
 	public function save_navigation($type='insert', $id=0) 
 	{	
-			
+		if ($type == 'insert')
+		{
+			$_POST['has_kids'] = 0;
+			$_POST['position'] = 99;
+		}
+
 		$this->form_validation->set_rules('title','Title','required|trim|xss_clean|max_length[30]');			
 		$this->form_validation->set_rules('url','URL','required|trim|xss_clean|max_length[150]');			
 		$this->form_validation->set_rules('nav_group_id','Group','required|trim|xss_clean|is_numeric|max_length[11]');			
-		$this->form_validation->set_rules('position','Position','required|trim|xss_clean|is_numeric|max_length[2]');			
 		$this->form_validation->set_rules('parent_id','Parent','required|trim|xss_clean|is_numeric|max_length[11]');			
-		$this->form_validation->set_rules('has_kids','Has Kids','required|trim|xss_clean|is_numeric|max_length[1]');
 		if ($this->form_validation->run() === false)
 		{
 			return false;
@@ -172,17 +187,27 @@ class Content extends Admin_Controller {
 			
 			if (is_numeric($id))
 			{
+				$this->navigation_model->update_parent($id, $this->input->post('parent_id'));
 				$return = true;
-			} else
+			}
+			else
 			{
 				$return = false;
 			}
 		}
 		else if ($type == 'update')
 		{
+			// check if there is a parent
+			$this->navigation_model->update_parent($id, $this->input->post('parent_id'));
 			$return = $this->navigation_model->update($id, $_POST);
 		}
 		
+//		if ($this->input->post('parent_id') != 0) {
+//			// there is a parent so update it to set the has_kids field
+//			$data = array('has_kids' => 1);
+//			$parent_updated = $this->navigation_model->update($this->input->post('parent_id'), $data);
+//
+//		}
 		return $return;
 	}
 	

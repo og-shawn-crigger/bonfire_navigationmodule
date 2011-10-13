@@ -8,6 +8,7 @@ class Groups extends Admin_Controller {
 
 		$this->auth->restrict('Navigation.Content.View');
 		$this->load->model('navigation_group_model');
+		$this->load->model('navigation_model');
 		$this->lang->load('navigation_group');
 		
 		Assets::add_js($this->load->view('groups/js', null, true), 'inline');
@@ -103,6 +104,8 @@ class Groups extends Admin_Controller {
 		{	
 			if ($this->navigation_group_model->delete($id))
 			{
+				// delete the nav items in the group
+				$this->navigation_model->delete_where(array('nav_group_id' => $id));
 				Template::set_message(lang("navigation_delete_success"), 'success');
 			} else
 			{

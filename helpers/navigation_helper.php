@@ -112,7 +112,18 @@ if (!function_exists('show_navigation'))
 
 			$output .= "<li";
 			$output .= !empty($attributes['class']) ? ' class="'.$attributes['class'].'"' : '';
-			$output .= ">".anchor($link->url, $link->title, $attributes);
+			
+			//check for full urls
+			if (FALSE === strpos($link->url, 'http'))
+			{
+				// allow for relative paths
+				$output .= ">".anchor(site_url($link->url), $link->title, $attributes);
+			}
+			else
+			{
+				$output .= ">".anchor($link->url, $link->title, $attributes);
+			}
+			
 			$output .= $child_html;
 			$output .= "</li>" . PHP_EOL;
 		}

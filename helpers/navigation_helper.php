@@ -73,18 +73,23 @@ if (!function_exists('show_navigation'))
 	Returns the navigation html for a given navigation level and is used recursively.
 	
 	Parameters:
-		$links			- Array of links to display.
-		$top			- Whether this is the top level or not.
+		$links			    - Array of links to display.
+		$top			      - Whether this is the top level or not.
 		$show_children	- Whether to show the child menu items or not.
-		$attributes		- Array of attributes - used for id and class at the moment.
-		
+		$attributes		  - Array of attributes - used for id and class, active class and wrapper at the moment.
+											Set wrap to true inside of attributes to output tags wrapped in spans
+
 	Return:
 		A string with the full html for the navigation items. 
 */
 	function show_level($links, $top=FALSE, $show_children = TRUE, $attributes=array())
 	{
 		$has_current = FALSE;
-		$output = '<ul';
+
+		$wrap        = ( isset( $attributes['wrap'] ) && ( $attributes['wrap'] == true ) ) ? true : false;
+		$act_class   = ( isset ( $attributes['active'] ) ? $attributes['active'] : 'current';
+		$output      = '<ul';
+
 		if ($top)
 		{
 			$output .= empty($attributes['id']) ? '' : ' id="'.$attributes['id'].'"';
@@ -106,7 +111,7 @@ if (!function_exists('show_navigation'))
 
 			if ("/".trim(uri_string(), '/') == $link->url || $child_current)
 			{
-				$attributes['class'] = 'current';
+				$attributes['class'] = $act_class;
 				$has_current = TRUE;
 			}
 
@@ -117,11 +122,13 @@ if (!function_exists('show_navigation'))
 			if (FALSE === strpos($link->url, 'http'))
 			{
 				// allow for relative paths
-				$output .= ">".anchor(site_url($link->url), $link->title, $attributes);
+				$ltitle  = ( $wrap == true ) ? '<span>' . $link->title . '</span>' : $link->title;
+				$output .= ">".anchor(site_url($link->url), $ltitle, $attributes);
 			}
 			else
 			{
-				$output .= ">".anchor($link->url, $link->title, $attributes);
+				$ltitle  = ( $wrap == true ) ? '<span>' . $link->title . '</span>' : $link->title;
+				$output .= ">".anchor($link->url, $ltitle, $attributes);
 			}
 			
 			$output .= $child_html;

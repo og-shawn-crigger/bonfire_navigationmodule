@@ -17,13 +17,20 @@ This is a simple Navigation Module for the Bonfire (http://cibonfire.com/) appli
 - Drag-drop Nav item order
 - Editable in the Content context inside Bonfire
 
+## Changes
+- Added setting to wrap list items in a span for for css styling
+- Added setting to change the name of the current active class, defaults to current
+
 ## Helper
 
 The navigation_helper is very simple to use.
 
-		$attributes['id'] = 'nav';
-		$attributes['class'] = 'dropdown dropdown-horizontal';
-		
+		$attributes['id']     = 'nav';
+		$attributes['class']  = 'dropdown dropdown-horizontal';
+
+		$attributes['active'] = 'active'; 
+    $attributes['wrap']   = true;
+
 		echo show_navigation('header', TRUE, $attributes);
 
 In this case "header" is the Navigation group defined in the Bonfire admin.

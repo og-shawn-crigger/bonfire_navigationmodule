@@ -29,7 +29,7 @@ The navigation_helper is very simple to use.
 		$attributes['class']  = 'dropdown dropdown-horizontal';
 
 		$attributes['active'] = 'active'; 
-    $attributes['wrap']   = true;
+		$attributes['wrap']   = true;
 
 		echo show_navigation('header', TRUE, $attributes);
 

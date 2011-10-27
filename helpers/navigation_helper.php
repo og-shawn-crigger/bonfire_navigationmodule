@@ -76,20 +76,16 @@ if (!function_exists('show_navigation'))
 		$links			    - Array of links to display.
 		$top			      - Whether this is the top level or not.
 		$show_children	- Whether to show the child menu items or not.
-		$attributes		  - Array of attributes - used for id and class, active class and wrapper at the moment.
+		$attributes		  - Array of attributes - used for id and class at the moment.
 											Set wrap to true inside of attributes to output tags wrapped in spans
-
+		
 	Return:
 		A string with the full html for the navigation items. 
 */
 	function show_level($links, $top=FALSE, $show_children = TRUE, $attributes=array())
 	{
 		$has_current = FALSE;
-
-		$wrap        = ( isset( $attributes['wrap'] ) && ( $attributes['wrap'] == true ) ) ? true : false;
-		$act_class   = ( isset ( $attributes['active'] ) ? $attributes['active'] : 'current';
-		$output      = '<ul';
-
+		$output = '<ul';
 		if ($top)
 		{
 			$output .= empty($attributes['id']) ? '' : ' id="'.$attributes['id'].'"';
@@ -97,6 +93,8 @@ if (!function_exists('show_navigation'))
 		}
 		$output .= '>';
 		
+		$wrap = ( isset( $attributes['wrap'] ) && ( $attributes['wrap'] == true ) ) ? true : false;
+			
 		foreach ($links as $link)
 		{
 			$child_html = '';
@@ -111,7 +109,7 @@ if (!function_exists('show_navigation'))
 
 			if ("/".trim(uri_string(), '/') == $link->url || $child_current)
 			{
-				$attributes['class'] = $act_class;
+				$attributes['class'] = 'current active';
 				$has_current = TRUE;
 			}
 
@@ -138,4 +136,25 @@ if (!function_exists('show_navigation'))
 		
 		return array($output, $has_current);
 	}
+
+
+	function fetch_metatags()
+	{
+		$ci =& get_instance();	
+
+		$slug = trim(uri_string('home'), '/');
+
+		$query = $ci->db->like('url',$slug)->get('navigation');			
+
+		if ($query->num_rows() == 1 )
+		{
+			$metas = $query->row();
+			
+			$query->free_result();
+			return $metas;
+		} else {
+			return array();
+		}
+	}
+	 	
 }

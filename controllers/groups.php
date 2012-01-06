@@ -10,9 +10,7 @@ class Groups extends Admin_Controller {
 		$this->load->model('navigation_group_model');
 		$this->load->model('navigation_model');
 		$this->lang->load('navigation_group');
-		
-		Assets::add_js($this->load->view('groups/js', null, true), 'inline');
-		
+				
 		Template::set_block('sub_nav', 'content/_sub_nav');
 	}
 	
@@ -27,6 +25,7 @@ class Groups extends Admin_Controller {
 		$data = array();
 		$data["records"] = $this->navigation_group_model->find_all();
 
+		Assets::add_js($this->load->view('groups/js', null, true), 'inline');
 		Template::set_view("groups/index");
 		Template::set("data", $data);
 		Template::set("toolbar_title", "Manage Navigation Groups");

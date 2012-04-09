@@ -47,54 +47,62 @@ if (!function_exists('show_navigation'))
 	function show_navigation($abbrev, $show_children = TRUE, $attributes=array())
 	{
 		$ci =& get_instance();
-		
-		$query = $ci->db->select('nav_group_id')->where('abbr',$abbrev)->get('navigation_group');
-		
-		if (!$query || $query->num_rows() == 0)
-		{
-			return;
-		}
-		
-		$group_details = $query->result();
-		
-		$ci->load->model('navigation/navigation_model');
-		
-		$group_links = $ci->navigation_model->load_group($group_details[0]->nav_group_id);
-		
-		list($output, $cur) = show_level($group_links, TRUE, $show_children, $attributes);
-		
-		return $output;
 
+		if ($ci->db->table_exists('navigation_group')) {
+			$query = $ci->db->select('nav_group_id')->where('abbr',$abbrev)->get('navigation_group');
+
+			if (!$query || $query->num_rows() == 0)
+			{
+				return;
+			}
+
+			$group_details = $query->result();
+
+			$ci->load->model('navigation/navigation_model');
+
+			$group_links = $ci->navigation_model->load_group($group_details[0]->nav_group_id);
+
+			list($output, $cur) = show_level($group_links, TRUE, $show_children, $attributes);
+
+			return $output;
+		}
+		else {
+			return false;
+		}
 	}
-	
-/*
-	Function: show_level()
-	
-	Returns the navigation html for a given navigation level and is used recursively.
-	
-	Parameters:
-		$links			    - Array of links to display.
-		$top			      - Whether this is the top level or not.
-		$show_children	- Whether to show the child menu items or not.
-		$attributes		  - Array of attributes - used for id and class at the moment.
-											Set wrap to true inside of attributes to output tags wrapped in spans
-		
-	Return:
-		A string with the full html for the navigation items. 
-*/
+
+	/*
+	 Function: show_level()
+
+	 Returns the navigation html for a given navigation level and is used recursively.
+
+	 Parameters:
+		 $links			    - Array of links to display.
+		 $top			      - Whether this is the top level or not.
+		 $show_children	- Whether to show the child menu items or not.
+		 $attributes		  - Array of attributes - used for id and class, active class and wrapper at the moment.
+											 Set wrap to true inside of attributes to output tags wrapped in spans
+
+	 Return:
+		 A string with the full html for the navigation items.
+ */
 	function show_level($links, $top=FALSE, $show_children = TRUE, $attributes=array())
 	{
 		$has_current = FALSE;
-		$output = '<ul';
+
+		$wrap        = ( isset( $attributes['wrap'] ) && ( $attributes['wrap'] == true ) ) ? true : false;
+		$act_class   = isset ( $attributes['active'] ) ? $attributes['active'] : 'active';
+
+		$output      = '<ul';
+
 		if ($top)
 		{
 			$output .= empty($attributes['id']) ? '' : ' id="'.$attributes['id'].'"';
 			$output .= empty($attributes['class']) ? '' : ' class="'.$attributes['class'].'"';
 		}
+
 		$output .= '>';
-		
-		$wrap = ( isset( $attributes['wrap'] ) && ( $attributes['wrap'] == true ) ) ? true : false;
-			
+
 		foreach ($links as $link)
 		{
 			$child_html = '';
@@ -103,23 +111,38 @@ if (!function_exists('show_navigation'))
 
 			if ($show_children && !empty($link->children) AND is_array($link->children) AND count($link->children))
 			{
+
 				list($child_html, $child_current) = show_level($link->children, FALSE);
-				
+				Console::log($child_html);
+
+/*
+			<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown">CATEGORIES
+			<b class="caret"></b>
+			</a>
+			<ul class="dropdown-menu">
+			<li><a href="<?= site_url(); ?>categories/weddings">WEDDINGS</a></li>
+			<li><a href="<?= site_url(); ?>categories/portraits">PORTRAITS</a></li>
+			<li><a href="<?= site_url(); ?>categories/commercial">COMMERCIAL</a></li>
+			</ul>
+			</li>
+*/
 			}
 
-			if ("/".trim(uri_string(), '/') == $link->url || $child_current)
+			if ('/'.trim(uri_string(), '/') == $link->url || $child_current)
 			{
-				$attributes['class'] = 'current active';
+				$attributes['class'] = $act_class;
 				$has_current = TRUE;
 			}
 
-			$output .= "<li";
+			$output .= '<li ';
 			$output .= !empty($attributes['class']) ? ' class="'.$attributes['class'].'"' : '';
-			
+
 			//check for full urls
 			if (FALSE === strpos($link->url, 'http'))
 			{
 				// allow for relative paths
+
 				$ltitle  = ( $wrap == true ) ? '<span>' . $link->title . '</span>' : $link->title;
 				$output .= ">".anchor(site_url($link->url), $ltitle, $attributes);
 			}
@@ -128,33 +151,12 @@ if (!function_exists('show_navigation'))
 				$ltitle  = ( $wrap == true ) ? '<span>' . $link->title . '</span>' : $link->title;
 				$output .= ">".anchor($link->url, $ltitle, $attributes);
 			}
-			
+
 			$output .= $child_html;
 			$output .= "</li>" . PHP_EOL;
 		}
 		$output .= "</ul>" . PHP_EOL;
-		
+
 		return array($output, $has_current);
 	}
-
-
-	function fetch_metatags()
-	{
-		$ci =& get_instance();	
-
-		$slug = trim(uri_string('home'), '/');
-
-		$query = $ci->db->like('url',$slug)->get('navigation');			
-
-		if ($query->num_rows() == 1 )
-		{
-			$metas = $query->row();
-			
-			$query->free_result();
-			return $metas;
-		} else {
-			return array();
-		}
-	}
-	 	
 }

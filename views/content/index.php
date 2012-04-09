@@ -1,77 +1,81 @@
+<div class="admin-box">
+	<h3>Navigation</h3>
 
-<div class="view split-view">
-	
-	<!-- Role List -->
-	<div class="view">
-	
-	<?php if (isset($records) && is_array($records) && count($records)) : ?>
-		<div class="scrollable">
-			<div class="list-view" id="role-list">
-				<?php foreach ($records as $record) : ?>
-					<?php $record = (array)$record;?>
-					<div class="list-item" data-id="<?php echo $record['nav_id']; ?>">
-						<p>
-							<b><?php echo $record['title']; ?></b><br/>
-							<span class="small">URL:<?php echo $record['url']; ?><br />GROUP:<?php echo $groups[$record['nav_group_id']]->title; ?></span>
-						</p>
-					</div>
-				<?php endforeach; ?>
-			</div>	<!-- /list-view -->
-		</div>
-	
-	<?php else: ?>
-	
-	<div class="notification attention">
-		<p><?php echo lang('navigation_no_records'); ?> <?php echo anchor(SITE_AREA.'/content/navigation/create', lang('navigation_create_new'), array("class" => "ajaxify")) ?></p>
+	<ul class="nav nav-tabs" >
+		<li <?php echo $filter=='' ? 'class="active"' : ''; ?>><a href="<?php echo $current_url; ?>">All</a></li>
+		<li <?php echo $filter=='group' ? 'class="active"' : ''; ?> class="dropdown">
+			<a href="#" class="drodown-toggle" data-toggle="dropdown">
+				By Group <?php echo isset($filter_group) ? ": $filter_group" : ''; ?>
+				<b class="caret light-caret"></b>
+			</a>
+			<ul class="dropdown-menu">
+			<?php foreach ($groups as $group) : ?>
+				<li>
+					<a href="<?php echo "{$current_url}?filter=group&group_id=". $group->nav_group_id ?>">
+						<?php echo $group->title; ?>
+					</a>
+				</li>
+			<?php endforeach; ?>
+			</ul>
+		</li>
+	</ul>
+
+	<?php echo form_open(current_url()) ;?>
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th class="column-check"><input class="check-all" type="checkbox" /></th>
+				<th><?php echo lang('us_article_id'); ?></th>
+				<th><?php echo lang('navigation_title_label'); ?></th>
+				<th><?php echo lang('navigation_url_label'); ?></th>
+				<th><?php echo lang('navigation_group_label'); ?></th>
+				<th><?php echo lang('navigation_parent_label'); ?></th>
+			</tr>
+		</thead>
+		<?php if (isset($records) && is_array($records) && count($records)) : ?>
+		<tfoot>
+		<tr>
+			<td colspan="6">
+				<?php echo lang('bf_with_selected') ?>
+				<input type="submit" name="submit" class="btn-danger" id="delete-me" value="<?php echo lang('bf_action_delete') ?>" onclick="return confirm('<?php echo lang('navigation_delete_confirm'); ?>')">
+			</td>
+		</tr>
+		</tfoot>
+		<?php endif; ?>
+
+		<tbody>
+		<?php if (isset($records) && is_array($records) && count($records)) : ?>
+			<?php foreach ($records as $record) : ?>
+			<tr>
+				<td>
+					<input type="checkbox" name="checked[]" value="<?php echo $record->nav_id ?>" />
+				</td>
+				<td><?php echo $record->nav_id ?></td>
+				<td><?php echo anchor(SITE_AREA.'/content/navigation/edit/'. $record->nav_id, $record->title) ?></td>
+				<td><?php echo $record->url; ?></td>
+				<td><?php
+				foreach($groups as $group) {
+					if ($group->nav_group_id == $record->nav_group_id) {
+						echo $group->title;
+					}
+				} ?></td>
+				<td><?php echo $record->parent_id != 0 && isset($records[$record->parent_id]->title) ? $records[$record->parent_id]->title : ''; ?></td>
+			</tr>
+			<?php endforeach; ?>
+		<?php else: ?>
+			<tr>
+				<td colspan="6">No items were found that match your selection.</td>
+			</tr>
+		<?php endif; ?>
+		</tbody>
+	</table>
+
+	<div class="well">
+		<?php echo $total_records.' records found'; ?>
 	</div>
-	
-	<?php endif; ?>
-	</div>
-	<!-- Role Editor -->
-	<div id="content" class="view">
-		<div class="scrollable" id="ajax-content">
-				
-			<div class="box create rounded">
-				<a class="button good ajaxify" href="<?php echo site_url(SITE_AREA.'/content/navigation/create')?>"><?php echo lang('navigation_create_new_button');?></a>
+	<?php echo form_close(); ?>
 
-				<h3><?php echo lang('navigation_create_new');?></h3>
+	<?php echo $this->pagination->create_links(); ?>
 
-				<p><?php echo lang('navigation_edit_text'); ?></p>
-			</div>
-			<br />
-<?php if (isset($records) && is_array($records) && count($records)) : ?>
-			<h2>Navigation</h2>
-		<?php
-		$group = '';
-		foreach ($records as $record) : ?>
-			<?php if ( !empty($group) AND $group != $record->nav_group_id): ?>
-					</tbody>
-				</table>
-				</div>
-			<?php endif;?>
-			<?php if ($group != $record->nav_group_id): ?>
-			<div>
-				<h3><?php echo $groups[$record->nav_group_id]->title;?></h3>
-				<table>
-					<thead>
-					<th>Title</th>
-					<th>URL</th>
-					<th>Parent</th>
-					</thead>
-					<tbody class="sortable">
-			<?php endif;?>
-					<tr>
-					<td><?php echo form_hidden('action_to[]', $record->nav_id); ?><?php echo anchor(SITE_AREA.'/content/navigation/edit/'. $record->nav_id, $record->title, 'class="ajaxify"') ?></td>
-					<td><?php echo $record->url;?></td>
-					<td><?php echo $record->parent_id != 0 && isset($records[$record->parent_id]->title) ? $records[$record->parent_id]->title : '';?></td>
-					</tr>
-			<?php  $group = $record->nav_group_id; ?>
-		<?php endforeach; ?>
-					</tbody>
-				</table>
-				</div>
-<?php endif; ?>
-				
-		</div>	<!-- /ajax-content -->
-	</div>	<!-- /content -->
 </div>

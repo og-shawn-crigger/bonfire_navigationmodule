@@ -10,13 +10,12 @@ class Groups extends Admin_Controller {
 		$this->load->model('navigation_group_model');
 		$this->load->model('navigation_model');
 		$this->lang->load('navigation_group');
-		
-		Assets::add_js($this->load->view('groups/js', null, true), 'inline');
-		
+				
 		Template::set_block('sub_nav', 'content/_sub_nav');
 	}
-	
-	
+
+	//--------------------------------------------------------------------
+
 	/** 
 	 * function index
 	 *
@@ -24,18 +23,49 @@ class Groups extends Admin_Controller {
 	 */
 	public function index()
 	{
-		$data = array();
-		$data["records"] = $this->navigation_group_model->find_all();
 
-		Template::set_view("groups/index");
-		Template::set("data", $data);
-		Template::set("toolbar_title", "Manage Navigation Groups");
+		$offset = $this->uri->segment(5);
+
+		// Do we have any actions?
+		if ($action = $this->input->post('submit'))
+		{
+			$checked = $this->input->post('checked');
+
+			switch(strtolower($action))
+			{
+				case 'delete':
+					$this->delete($checked);
+					break;
+			}
+		}
+
+		$this->load->helper('ui/ui');
+
+		$this->navigation_group_model->limit($this->limit, $offset);
+		$this->navigation_group_model->select('*');
+
+		Template::set('records', $this->navigation_group_model->find_all());
+
+		// Pagination
+		$this->load->library('pagination');
+
+		$total_records = $this->navigation_group_model->count_all();
+
+		$this->pager['base_url'] = site_url(SITE_AREA .'/content/navigation/groups/index');
+		$this->pager['total_rows'] = $total_records;
+		$this->pager['per_page'] = $this->limit;
+		$this->pager['uri_segment']	= 5;
+
+		$this->pagination->initialize($this->pager);
+
+		Template::set('current_url', current_url());
+
+		Template::set('toolbar_title', lang('navigation_manage'));
 		Template::render();
 	}
 	
 	//--------------------------------------------------------------------
-	
-	
+
 	public function create() 
 	{
 		$this->auth->restrict('Navigation.Content.Create');
@@ -54,12 +84,11 @@ class Groups extends Admin_Controller {
 		}
 	
 		Template::set('toolbar_title', lang("navigation_create_new_button"));
-		Template::set_view('groups/create');
-		Template::set("toolbar_title", "Manage Navigation Groups");
+		Template::set_view('groups/form');
 		Template::render();
 	}
-	//--------------------------------------------------------------------
 	
+	//--------------------------------------------------------------------
 	
 	public function edit() 
 	{
@@ -88,34 +117,61 @@ class Groups extends Admin_Controller {
 		Template::set('navigation', $this->navigation_group_model->find($id));
 	
 		Template::set('toolbar_title', lang("navigation_edit_heading"));
-		Template::set_view('groups/edit');
-		Template::set("toolbar_title", "Manage Navigation Groups");
+		Template::set_view('groups/form');
 		Template::render();
 	}
-	
-			
-	public function delete() 
-	{	
-		$this->auth->restrict('Navigation.Content.Delete');
 
-		$id = $this->uri->segment(6);
-	
-		if (!empty($id))
-		{	
-			if ($this->navigation_group_model->delete($id))
+	//--------------------------------------------------------------------
+
+	public function delete($groups)
+	{
+
+		if (empty($groups))
+		{
+			$nav_group_id = $this->uri->segment(5);
+
+			if(!empty($nav_group_id))
 			{
-				// delete the nav items in the group
-				$this->navigation_model->delete_where(array('nav_group_id' => $id));
-				Template::set_message(lang("navigation_delete_success"), 'success');
-			} else
-			{
-				Template::set_message(lang("navigation_delete_failure") . $this->navigation_group_model->error, 'error');
+				$groups = array($nav_group_id);
 			}
 		}
-		
-		redirect(SITE_AREA.'/content/navigation/groups');
+
+		if (!empty($groups))
+		{
+			$this->auth->restrict('Navigation.Content.Delete');
+
+			foreach ($groups as $nav_group_id)
+			{
+				$group = $this->navigation_group_model->find($nav_group_id);
+
+				if (isset($group))
+				{
+					if ($this->navigation_group_model->delete($nav_group_id))
+					{
+						$this->navigation_model->delete_where(array('nav_group_id' => $nav_group_id));
+						Template::set_message(lang('navigation_delete_success'), 'success');
+					}
+					else
+					{
+						Template::set_message(lang('navigation_delete_failure'). $this->navigation_group_model->error, 'error');
+					}
+				}
+				else
+				{
+					Template::set_message(lang('navigation_group_not_found'), 'error');
+				}
+			}
+		}
+		else
+		{
+			Template::set_message(lang('navigation_empty_list'), 'error');
+		}
+
+		redirect(SITE_AREA .'/content/navigation/groups');
 	}
-		
+	
+	//--------------------------------------------------------------------
+			
 	public function save_navigation($type='insert', $id=0) 
 	{	
 			

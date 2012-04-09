@@ -1,75 +1,53 @@
+<div class="admin-box">
+	<h3><?php echo "Navigation"; ?></h3>
 
-<div class="view split-view">
-	
-	<!-- Role List -->
-	<div class="view">
-	
-	<?php if (isset($records) && is_array($records) && count($records)) : ?>
-		<div class="scrollable">
-			<div class="list-view" id="role-list">
-				<?php foreach ($records as $record) : ?>
-					<?php $record = (array)$record;?>
-					<div class="list-item" data-id="<?php echo $record['nav_group_id']; ?>">
-						<p>
-							<b><?php echo $record['title']; ?></b><br/>
-							<span class="small">Abbr: <?php echo $record['abbr']; ?></span>
-						</p>
-					</div>
-				<?php endforeach; ?>
-			</div>	<!-- /list-view -->
-		</div>
-	
-	<?php else: ?>
-	
-	<div class="notification attention">
-		<p><?php echo lang('navigation_no_records'); ?> <?php echo anchor(SITE_AREA.'/content/navigation/groups/create', lang('navigation_create_new'), array("class" => "ajaxify")) ?></p>
-	</div>
-	
-	<?php endif; ?>
-	</div>
-	<!-- Role Editor -->
-	<div id="content" class="view">
-		<div class="scrollable" id="ajax-content">
-				
-			<div class="box create rounded">
-				<a class="button good ajaxify" href="<?php echo site_url(SITE_AREA.'/content/navigation/groups/create')?>"><?php echo lang('navigation_create_new_button');?></a>
+	<ul class="nav nav-tabs" >
+		<li class="active"><a href="#">All</a></li>
+	</ul>
 
-				<h3><?php echo lang('navigation_create_new');?></h3>
+	<?php echo form_open(current_url()) ;?>
 
-				<p><?php echo lang('navigation_edit_text'); ?></p>
-			</div>
-			<br />
-				<?php if (isset($records) && is_array($records) && count($records)) : ?>
-				
-					<h2>Navigation</h2>
-	<table>
+	<table class="table table-striped">
 		<thead>
-		<th>Title</th>
-		<th>Abbreviation</th><th><?php echo lang('navigation_actions'); ?></th>
-		</thead>
-		<tbody>
-<?php
-foreach ($records as $record) : ?>
-<?php $record = (array)$record;?>
 			<tr>
-<?php
-	foreach($record as $field => $value)
-	{
-		if($field != "nav_group_id") {
-?>
-				<td><?php echo $value;?></td>
-
-<?php
-		}
-	}
-?>
-				<td><?php echo anchor(SITE_AREA.'/content/navigation/groups/edit/'. $record['nav_group_id'], 'Edit', 'class="ajaxify"') ?></td>
+				<th class="column-check"><input class="check-all" type="checkbox" /></th>
+				<th><?php echo lang('navigation_group_id'); ?></th>
+				<th><?php echo lang('navigation_group_title'); ?></th>
+				<th><?php echo lang('navigation_abbreviation'); ?></th>
 			</tr>
-<?php endforeach; ?>
+		</thead>
+		<?php if (isset($records) && is_array($records) && count($records)) : ?>
+		<tfoot>
+			<tr>
+				<td colspan="6">
+					<?php echo lang('bf_with_selected') ?>
+					<input type="submit" name="submit" class="btn-danger" id="delete-me" value="<?php echo lang('bf_action_delete') ?>" onclick="return confirm('<?php echo lang('navigation_delete_confirm'); ?>')">
+				</td>
+			</tr>
+		</tfoot>
+		<?php endif; ?>
+		<tbody>
+
+		<?php if (isset($records) && is_array($records) && count($records)) : ?>
+			<?php foreach ($records as $record) : ?>
+			<tr>
+				<td>
+					<input type="checkbox" name="checked[]" value="<?php echo $record->nav_group_id ?>" />
+				</td>
+				<td><?php echo $record->nav_group_id ?></td>
+				<td><?php echo anchor(SITE_AREA.'/content/navigation/groups/edit/'. $record->nav_group_id, $record->title) ?></td>
+				<td><?php echo $record->abbr; ?></td>
+			</tr>
+			<?php endforeach; ?>
+		<?php else: ?>
+			<tr>
+				<td colspan="6"></php echo echo lang('navigation_no_records'); ?> <?php echo anchor(SITE_AREA.'/content/navigation/groups/create', lang('navigation_create_new'));?>.</td>
+			</tr>
+		<?php endif; ?>
 		</tbody>
 	</table>
-				<?php endif; ?>
-				
-		</div>	<!-- /ajax-content -->
-	</div>	<!-- /content -->
+	<?php echo form_close(); ?>
+
+	<?php echo $this->pagination->create_links(); ?>
+
 </div>

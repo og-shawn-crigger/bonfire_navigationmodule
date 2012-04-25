@@ -8,7 +8,8 @@ $(function() {
 function update_order(event, ui) {
 	order = new Array();
 	$('tr', this).each(function(){
-		order.push( $(this).find('input[name="action_to[]"]').val() );
+		console.log( $(this).find('input[name="checked[]"]').val() );
+		order.push( $(this).find('input[name="checked[]"]').val() );
 	});
 	order = order.join(',');
 

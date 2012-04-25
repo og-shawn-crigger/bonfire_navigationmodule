@@ -40,7 +40,7 @@ class Content extends Admin_Controller {
 		$this->lang->load('navigation');
 		
 //		Assets::add_css('flick/jquery-ui-1.8.13.custom.css');
-		Assets::add_js('jquery-ui-1.8.8.min.js');
+		Assets::add_js('jquery-ui-1.8.16.custom.min.js');
 		
 		Template::set_block('sub_nav', 'content/_sub_nav');
 	}
@@ -59,8 +59,10 @@ class Content extends Admin_Controller {
 		$offset = $this->uri->segment(5);
 
 		// Do we have any actions?
-		if ($action = $this->input->post('submit'))
+		if ($this->input->post('submit'))
 		{
+			$action = $this->input->post('submit');
+
 			$checked = $this->input->post('checked');
 
 			switch(strtolower($action))
@@ -90,7 +92,7 @@ class Content extends Admin_Controller {
 		$this->navigation_model->limit($this->limit, $offset)->where($where);
 		$this->navigation_model->select('*');
 
-		Template::set('records', $this->navigation_model->find_all());
+		Template::set('records', $this->navigation_model->order_by('nav_group_id, position')->find_all());
 
 		// Pagination
 		$this->load->library('pagination');
@@ -106,6 +108,7 @@ class Content extends Admin_Controller {
 
 		$this->pagination->initialize($this->pager);
 
+		Assets::add_js( $this->load->view('navigation/content/js', null, TRUE), 'inline' );
 		Template::set('current_url', current_url());
 		Template::set('filter', $filter);
 		Template::set_view('navigation/content/index');
@@ -125,7 +128,6 @@ class Content extends Admin_Controller {
 		{
 			if ($this->save_navigation())
 			{
-
 				Template::set_message(lang('navigation_create_success'), 'success');
 				Template::redirect(SITE_AREA.'/content/navigation');
 			}
@@ -285,6 +287,7 @@ class Content extends Admin_Controller {
 
 	public function ajax_update_positions()
 	{
+		dump ( $_POST );
 		// Create an array containing the IDs
 		$ids = explode(',', $this->input->post('order'));
 

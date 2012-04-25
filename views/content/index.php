@@ -22,7 +22,7 @@
 
 	<?php echo form_open(current_url()) ;?>
 
-	<table class="table table-striped">
+	<table class="table table-striped ">
 		<thead>
 			<tr>
 				<th class="column-check"><input class="check-all" type="checkbox" /></th>
@@ -31,6 +31,7 @@
 				<th><?php echo lang('navigation_url_label'); ?></th>
 				<th><?php echo lang('navigation_group_label'); ?></th>
 				<th><?php echo lang('navigation_parent_label'); ?></th>
+				<th>Position</th>
 			</tr>
 		</thead>
 		<?php if (isset($records) && is_array($records) && count($records)) : ?>
@@ -44,7 +45,7 @@
 		</tfoot>
 		<?php endif; ?>
 
-		<tbody>
+		<tbody class="sortable ui-sortable">
 		<?php if (isset($records) && is_array($records) && count($records)) : ?>
 			<?php foreach ($records as $record) : ?>
 			<tr>
@@ -54,13 +55,15 @@
 				<td><?php echo $record->nav_id ?></td>
 				<td><?php echo anchor(SITE_AREA.'/content/navigation/edit/'. $record->nav_id, $record->title) ?></td>
 				<td><?php echo $record->url; ?></td>
-				<td><?php
-				foreach($groups as $group) {
-					if ($group->nav_group_id == $record->nav_group_id) {
+				<td>
+				<?php foreach($groups as $group) :
+					if ($group->nav_group_id == $record->nav_group_id) :
 						echo $group->title;
-					}
-				} ?></td>
+					endif;
+				endforeach; ?>
+				</td>
 				<td><?php echo $record->parent_id != 0 && isset($records[$record->parent_id]->title) ? $records[$record->parent_id]->title : ''; ?></td>
+				<td><?= $record->position; ?></td>
 			</tr>
 			<?php endforeach; ?>
 		<?php else: ?>

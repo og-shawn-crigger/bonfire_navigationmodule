@@ -44,11 +44,24 @@
 if (!function_exists('show_navigation'))
 {
 
+	/**
+	 *
+	 * @property CI_Loader $load
+	 * @property CI_Loader $load
+	 * @property navigation_model $navigation_model
+	 *
+	 *
+	 * @param $abbrev
+	 * @param bool $show_children
+	 * @param array $attributes
+	 * @return bool
+	 */
 	function show_navigation($abbrev, $show_children = TRUE, $attributes=array())
 	{
 		$ci =& get_instance();
 
-		if ($ci->db->table_exists('navigation_group')) {
+		if ($ci->db->table_exists('navigation_group'))
+		{
 			$query = $ci->db->select('nav_group_id')->where('abbr',$abbrev)->get('navigation_group');
 
 			if (!$query || $query->num_rows() == 0)
@@ -62,8 +75,22 @@ if (!function_exists('show_navigation'))
 
 			$group_links = $ci->navigation_model->load_group($group_details[0]->nav_group_id);
 
+			if ( !isset($first) )
+			{
+				$first = true;
+			}
+
+
+			if ( $first === true )
+			{
+				$attributes['class'] = 'nav main';
+			} else {
+				$attributes = array();
+			}
+
 			list($output, $cur) = show_level($group_links, TRUE, $show_children, $attributes);
 
+			$first = false;
 			return $output;
 		}
 		else {
@@ -90,15 +117,17 @@ if (!function_exists('show_navigation'))
 	{
 		$has_current = FALSE;
 
-		$wrap        = ( isset( $attributes['wrap'] ) && ( $attributes['wrap'] == true ) ) ? true : false;
+		$caret       = PHP_EOL . '<b class="caret"></b>' . PHP_EOL;
 		$act_class   = isset ( $attributes['active'] ) ? $attributes['active'] : 'active';
 
-		$output      = '<ul';
+		$output      = PHP_EOL . '<ul ';
 
 		if ($top)
 		{
 			$output .= empty($attributes['id']) ? '' : ' id="'.$attributes['id'].'"';
 			$output .= empty($attributes['class']) ? '' : ' class="'.$attributes['class'].'"';
+		} else {
+			$output .= empty($attributes['class']) ? ' class="dropdown-menu" ' : ' class="'.$attributes['class'].'"';
 		}
 
 		$output .= '>';
@@ -107,26 +136,14 @@ if (!function_exists('show_navigation'))
 		{
 			$child_html = '';
 			$child_current = FALSE;
+			$has_children  = FALSE;
 			$attributes = array();
 
 			if ($show_children && !empty($link->children) AND is_array($link->children) AND count($link->children))
 			{
 
 				list($child_html, $child_current) = show_level($link->children, FALSE);
-				Console::log($child_html);
-
-/*
-			<li class="dropdown">
-			<a href="#" class="dropdown-toggle" data-toggle="dropdown">CATEGORIES
-			<b class="caret"></b>
-			</a>
-			<ul class="dropdown-menu">
-			<li><a href="<?= site_url(); ?>categories/weddings">WEDDINGS</a></li>
-			<li><a href="<?= site_url(); ?>categories/portraits">PORTRAITS</a></li>
-			<li><a href="<?= site_url(); ?>categories/commercial">COMMERCIAL</a></li>
-			</ul>
-			</li>
-*/
+				$has_children = TRUE;
 			}
 
 			if ('/'.trim(uri_string(), '/') == $link->url || $child_current)
@@ -136,26 +153,51 @@ if (!function_exists('show_navigation'))
 			}
 
 			$output .= '<li ';
-			$output .= !empty($attributes['class']) ? ' class="'.$attributes['class'].'"' : '';
+			
+			if ( $has_children == TRUE )
+			{
+				$output .= ' class="dropdown" ';
+				$attributes['data-toggle'] = 'dropdown';
+				$attributes['class'] = 'dropdown-toggle';				
+			} else{
+				$output .= !empty($attributes['class']) ? ' class="'.$attributes['class'].'"' : '';	
+			}
+
+			$output .= '>'.PHP_EOL;
 
 			//check for full urls
 			if (FALSE === strpos($link->url, 'http'))
 			{
-				// allow for relative paths
+				if ( $has_children === TRUE )
+				{
+					$output .= '<a href="#" class="dropdown-toggle" data-toggle="dropdown">' . PHP_EOL;
+					$output .= $link->title;
+					$output .= $caret . '</a>';
+				} else {
+					$output .= anchor(site_url($link->url), $link->title, $attributes);
+				}
 
-				$ltitle  = ( $wrap == true ) ? '<span>' . $link->title . '</span>' : $link->title;
-				$output .= ">".anchor(site_url($link->url), $ltitle, $attributes);
 			}
 			else
 			{
-				$ltitle  = ( $wrap == true ) ? '<span>' . $link->title . '</span>' : $link->title;
-				$output .= ">".anchor($link->url, $ltitle, $attributes);
+
+				if ( $has_children === TRUE )
+				{
+					$output .= '<a href="#" class="dropdown-toggle" data-toggle="dropdown">' . PHP_EOL;
+					$output .= $link->title;
+					$output .= $caret . '</a>';
+				} else {
+					$output .= anchor($link->url, $link->title, $attributes);
+				}
+
 			}
 
-			$output .= $child_html;
-			$output .= "</li>" . PHP_EOL;
+			$output .= $child_html . PHP_EOL;
+
+			$output .= '</li>' . PHP_EOL;
 		}
-		$output .= "</ul>" . PHP_EOL;
+
+		$output .= '</ul>' . PHP_EOL;
 
 		return array($output, $has_current);
 	}

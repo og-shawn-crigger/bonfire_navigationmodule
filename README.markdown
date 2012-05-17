@@ -4,7 +4,7 @@ This is a simple Navigation Module for the Bonfire (http://cibonfire.com/) appli
 
 All Original Credits go to [Sean Downey](http://twitter.com/downey_sean) for this module.
 
-This version is my personal version, and is still in development.
+This version is my personal version, and is still in development, it may or may not work on your system.
 
 ## Install
 
@@ -12,6 +12,7 @@ This version is my personal version, and is still in development.
 - Run the module Install migration
 - Add the permissions to the required roles
 - Add the helper call to the theme
+- Sacrifice 10 Unicorns while doing Ubuntu Dance and hope it works
 - That's it
 
 ##Features
@@ -55,8 +56,10 @@ Sorry, Eventually, i'll run this through a doxyblocker and make you some docs, f
 ## Original Author Props
 
 I wanna thank Sean Downey for his work on this Module, and his commitment to Bonfire in General.
+I want to thank [Jeff Fox](https://github.com/jfox015) for his work on this module.
+
 
 - [Log Issues or Suggestions](https://github.com/svizion/bonfire_navigationmodule/issues)
 - [Follow me on Twitter](http://twitter.com/svizion)
-- [Follow me on Sean Downey on Twitter](http://twitter.com/downey_sean)
+- [Follow Sean Downey on Twitter](http://twitter.com/downey_sean)
 

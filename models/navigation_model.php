@@ -2,18 +2,18 @@
 
 class Navigation_model extends BF_Model {
 
-	protected $table		= "navigation";
-	protected $key			= "nav_id";
-	protected $soft_deletes	= false;
-	protected $date_format	= "datetime";
-	protected $set_created	= false;
-	protected $set_modified = false;
+	protected $table		= 'navigation';
+	protected $key			= 'nav_id';
+	protected $soft_deletes	= FALSE;
+	protected $date_format	= 'datetime';
+	protected $set_created	= FALSE;
+	protected $set_modified = FALSE;
 
 	/**
 	 * Load a group
 	 * 
 	 * @access public
-	 * @param string $abbrev The group abbrevation
+	 * @param string $abbrev The group abbreviation
 	 * @return mixed
 	 */
 	public function load_group($nav_group_id)
@@ -33,12 +33,14 @@ class Navigation_model extends BF_Model {
 				$segment1_match = site_url($this->uri->rsegment(1, '')) == $link->url;
 				
 				// Either the whole URI matches, or the first segment matches
-				if($link->current_link = $full_match || $segment1_match)
+				/*
+				if($link->current_link == $full_match || $segment1_match)
 				{
 					$has_current_link = true;
 				}
-				
-				//build a multidimensional array for submenus
+				  */
+
+				//build a multidimensional array for sub-menus
 				if($link->has_kids > 0 AND $link->parent_id == 0)
 				{
 					$link->children = $this->get_children($link->nav_id);
@@ -72,7 +74,9 @@ class Navigation_model extends BF_Model {
 	 * Get children
 	 *
 	 * @access public
-	 * @param integer Get links by parent id
+	 *
+	 * @param integer $id Get links by parent id
+	 *
 	 * @return mixed
 	 */
 	public function get_children($id)
@@ -92,7 +96,7 @@ class Navigation_model extends BF_Model {
 	 * @access public
 	 * @param int $id        The ID of the link item
 	 * @param int $parent_id ID of the parent
-	 * @return void
+	 * @return boolean
 	 */
 	public function update_parent($id = 0, $parent_id = 0) 
 	{

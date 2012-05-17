@@ -2,18 +2,19 @@
 
 class Navigation_group_model extends BF_Model {
 
-	protected $table		= "navigation_group";
-	protected $key			= "nav_group_id";
-	protected $soft_deletes	= false;
-	protected $date_format	= "datetime";
-	protected $set_created	= false;
-	protected $set_modified = false;
+	protected $table		= 'navigation_group';
+	protected $key			= 'nav_group_id';
+	protected $soft_deletes	= FALSE;
+	protected $date_format	= 'datetime';
+	protected $set_created	= FALSE;
+	protected $set_modified = FALSE;
 
-	public function find_all($sort_field=null)
+	public function find_all($sort_field=NULL)
 	{
 		$result_array = parent::find_all();
 		
-		if (null != $sort_field) {
+		if (NULL != $sort_field)
+		{
 			$output_array = array();
 
 			if (is_array($result_array) AND count($result_array))
